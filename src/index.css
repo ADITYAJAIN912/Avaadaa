@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
+
+@layer base {
+  body {
+    @apply m-0 bg-neutral-bg font-sans text-neutral-text antialiased;
+  }
+
+  #root {
+    @apply min-h-svh;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/40 focus-visible:ring-offset-2;
+  }
+
+  .ease-premium {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  /* Typography hierarchy */
+  .text-section-title {
+    @apply text-card-title font-semibold tracking-tight text-neutral-text;
+  }
+
+  .text-card-heading {
+    @apply text-body font-semibold text-neutral-text;
+  }
+
+  .text-meta {
+    @apply text-caption text-neutral-muted;
+  }
+
+  /* Inputs */
+  .input-field {
+    @apply w-full rounded-xl border border-neutral-border/80 bg-white py-2.5 pl-9 pr-4 text-body text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/50 focus:shadow-elevation-2 focus:ring-2 focus:ring-brand-teal/20;
+  }
+
+  .search-input {
+    @apply h-9 w-full rounded-xl border border-neutral-border/70 bg-white py-0 pl-10 pr-14 text-body leading-none text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/40 focus:shadow-elevation-1 focus:ring-2 focus:ring-brand-teal/20 md:pr-[4.25rem];
+  }
+
+  /* Surfaces */
+  .card-surface {
+    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out;
+  }
+
+  .card-surface-interactive {
+    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out hover:border-brand-teal/20 hover:shadow-elevation-1;
+  }
+
+  .card-hover-lift {
+    @apply hover:-translate-y-px;
+  }
+
+  .card-surface-primary {
+    @apply rounded-xl border border-brand-teal/12 bg-white shadow-elevation-1 ring-1 ring-brand-teal/5 transition-all duration-200 ease-out;
+  }
+
+  .card-surface-secondary {
+    @apply rounded-xl border border-neutral-border/70 bg-neutral-bg/50 shadow-elevation-1 transition-all duration-200 ease-out;
+  }
+
+  .container-surface {
+    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out;
+  }
+
+  /* Rows */
+  .row-interactive {
+    @apply cursor-pointer border-b border-neutral-border/60 transition-all duration-200 ease-out hover:bg-neutral-bg/70;
+  }
+
+  .row-highlight-now {
+    @apply bg-brand-tealLight/65 hover:bg-brand-tealLight/80;
+  }
+
+  .row-highlight-soon {
+    @apply bg-brand-tealLight/30 hover:bg-brand-tealLight/45;
+  }
+
+  .row-completed {
+    @apply opacity-[0.52] saturate-[0.9];
+  }
+
+  .row-overdue {
+    @apply bg-red-50/25 hover:bg-red-50/40;
+  }
+
+  /* Buttons */
+  .btn-premium {
+    @apply transition-all duration-200 ease-out hover:shadow-elevation-1 active:scale-[0.99];
+  }
+
+  /* Chips */
+  .chip {
+    @apply inline-flex h-9 items-center rounded-full px-3.5 text-body font-medium transition-all duration-200 ease-out;
+  }
+
+  .chip-active {
+    @apply bg-brand-teal text-white shadow-elevation-1;
+  }
+
+  .chip-inactive {
+    @apply border border-neutral-border/70 bg-white text-neutral-muted hover:border-brand-teal/20 hover:bg-brand-tealLight/40 hover:text-neutral-text;
+  }
+
+  /* Badges */
+  .badge-pill {
+    @apply inline-flex h-6 min-w-[1.5rem] shrink-0 items-center justify-center rounded-full px-2.5 text-caption font-medium leading-none;
+  }
+
+  .badge-group {
+    @apply inline-flex h-6 shrink-0 items-center gap-1 rounded-lg bg-neutral-bg/90 px-2 ring-1 ring-neutral-border/50;
+  }
+
+  /* Navigation */
+  .nav-item-active-bar {
+    @apply absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r bg-brand-teal transition-all duration-200 ease-out;
+  }
+
+  .nav-item-active {
+    @apply bg-brand-tealLight font-medium text-brand-teal shadow-elevation-1 ring-1 ring-brand-teal/8;
+  }
+
+  /* Toolbar cluster */
+  .toolbar-cluster {
+    @apply flex h-9 items-center gap-0.5 rounded-xl border border-neutral-border/70 bg-neutral-bg/50 p-0.5;
+  }
+}
