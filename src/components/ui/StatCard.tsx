@@ -1,7 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useCountUp } from '../../hooks/useCountUp'
-import { Card } from './Card'
 
 interface StatCardProps {
   value: number | string
@@ -37,12 +36,10 @@ export function StatCard({
       : 'text-neutral-muted'
 
   return (
-    <Card
-      variant="interactive"
-      as="button"
+    <button
       type="button"
       onClick={() => navigate(to)}
-      className="group focus-ring flex min-h-[4.75rem] w-full flex-col p-2.5 text-left shadow-sm ease-premium hover:-translate-y-px hover:shadow-md"
+      className="panel-surface focus-ring group flex min-h-[4.75rem] w-full flex-col p-2.5 text-left ease-premium hover:border-brand-teal/25"
       aria-label={`${label}, ${numericValue !== null ? value : String(value)}`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -75,6 +72,6 @@ export function StatCard({
           —
         </span>
       )}
-    </Card>
+    </button>
   )
 }

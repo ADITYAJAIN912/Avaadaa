@@ -38,7 +38,7 @@ export function DayGroupSection({
       </div>
 
       {view === 'list' ? (
-        <Card variant="container" className="overflow-hidden p-0">
+        <Card variant="container" className="p-0">
           {visible.map((m) => (
             <MeetingListRow
               key={m.id}

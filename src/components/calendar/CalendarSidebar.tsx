@@ -66,10 +66,7 @@ export function CalendarSidebar({
   const todayOverflow = todayEvents.length - visibleToday.length
 
   return (
-    <Card
-      variant="default"
-      className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-0 shadow-elevation-1"
-    >
+    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
       <section className="shrink-0 border-b border-neutral-border/50 p-3">
         <MiniCalendar
           year={year}

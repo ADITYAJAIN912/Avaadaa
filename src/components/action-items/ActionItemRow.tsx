@@ -106,10 +106,10 @@ export const ActionItemRow = memo(function ActionItemRow({ item }: ActionItemRow
         <a
           href="#"
           onClick={(e) => e.preventDefault()}
-          className="focus-ring inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-neutral-border/70 bg-white px-2.5 text-caption font-medium leading-none text-brand-teal ease-premium hover:border-brand-teal/30 hover:bg-brand-tealLight/30"
+          className="focus-ring inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 text-caption font-medium leading-none text-brand-teal ease-premium hover:bg-brand-tealLight/30"
         >
           <span className="hidden sm:inline">Open meeting</span>
-          <ExternalLink className="h-3 w-3" />
+          <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.75} />
         </a>
       </div>
     </>

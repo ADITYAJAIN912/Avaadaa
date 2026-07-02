@@ -10,7 +10,7 @@ export function CompanionButton() {
       type="button"
       onClick={toggleCompanion}
       aria-label="Ask your AI companion"
-      className="group focus-ring btn-premium fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-brand-teal px-5 py-3 text-body font-medium text-white shadow-elevation-1 hover:bg-brand-teal/90 hover:shadow-elevation-2 max-md:bottom-20 max-md:right-4"
+      className="group focus-ring btn-premium fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-brand-teal px-5 py-3 text-body font-medium text-white shadow-sm hover:bg-brand-teal/90 max-md:bottom-20 max-md:right-4"
     >
       <MessageCircle className="h-5 w-5" strokeWidth={1.75} />
       <span className="max-sm:hidden">Ask your Companion</span>

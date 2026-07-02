@@ -1,5 +1,6 @@
 import { TODAY } from '../../data/constants'
-import { Chip } from '../ui/Chip'
+import { ws } from '../../design-system/workspace'
+import { SegmentedControl } from '../ui/SegmentedControl'
 
 export type DateFilter = 'today' | 'tomorrow' | 'this-week' | 'custom'
 
@@ -24,21 +25,19 @@ export function FilterChips({
   onCustomDateChange,
 }: FilterChipsProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Date filter">
-      {filters.map((f) => (
-        <Chip
-          key={f.value}
-          label={f.label}
-          active={value === f.value}
-          onClick={() => onChange(f.value)}
-        />
-      ))}
+    <div className="flex flex-wrap items-center gap-2">
+      <SegmentedControl
+        options={filters}
+        value={value}
+        onChange={onChange}
+        ariaLabel="Date filter"
+      />
       {value === 'custom' && onCustomDateChange && (
         <input
           type="date"
           value={customDate}
           onChange={(e) => onCustomDateChange(e.target.value)}
-          className="focus-ring rounded-xl border border-neutral-border bg-white px-3 py-2 text-body text-neutral-text shadow-sm ease-premium outline-none focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/20"
+          className={ws.controlInput}
           aria-label="Pick a custom date"
         />
       )}

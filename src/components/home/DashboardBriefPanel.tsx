@@ -93,7 +93,8 @@ export function DashboardBriefPanel({
   const feed = recentMeeting ? buildFeed(recentMeeting) : []
 
   return (
-    <section className="card-surface flex h-full min-h-0 flex-col overflow-hidden shadow-sm">
+    <section className="panel-surface flex h-full min-h-0 flex-col">
+      <div className="surface-clip flex min-h-0 flex-1 flex-col">
       <header className="flex shrink-0 items-center justify-between border-b border-neutral-border/40 px-3 py-2">
         <div className="flex items-center gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-tealLight/60">
@@ -110,7 +111,7 @@ export function DashboardBriefPanel({
         </span>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="grid grid-cols-2 gap-1.5 p-2.5">
           {mockDashboardInsights.map((insight) => (
             <div
@@ -194,6 +195,7 @@ export function DashboardBriefPanel({
             </ul>
           </div>
         )}
+      </div>
       </div>
     </section>
   )

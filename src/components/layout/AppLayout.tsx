@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
 import { MobileTabBar } from './MobileTabBar'
-import { CompanionButton, CompanionPanel } from './CompanionPanel'
 import { useLayout } from '../../context/LayoutContext'
 
 const pageTitles: Record<string, string> = {
@@ -36,13 +35,11 @@ export function AppLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar title={title} />
-        <main className="flex-1 overflow-y-auto p-4 pb-44 md:p-6 md:max-lg:pb-32 lg:pb-8">
+        <main className="flex-1 overflow-y-auto p-4 pb-32 md:p-6 md:max-lg:pb-28 lg:pb-8">
           <Outlet />
         </main>
       </div>
       <MobileTabBar />
-      <CompanionButton />
-      <CompanionPanel />
     </div>
   )
 }

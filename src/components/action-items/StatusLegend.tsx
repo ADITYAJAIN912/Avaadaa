@@ -9,12 +9,12 @@ const legendItems: { status: ActionItem['status']; color: string; show: boolean 
 
 export function StatusLegend() {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border border-neutral-border/60 bg-white/80 px-3.5 py-2 text-caption text-neutral-muted shadow-elevation-1">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-muted">
       {legendItems
         .filter((item) => item.show)
         .map((item) => (
           <span key={item.status} className="inline-flex items-center gap-1.5">
-            <span className={`h-2 w-2 rounded-full ${item.color}`} aria-hidden />
+            <span className={`h-1.5 w-1.5 rounded-full ${item.color}`} aria-hidden />
             {item.status}
           </span>
         ))}

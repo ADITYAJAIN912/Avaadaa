@@ -18,7 +18,7 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate }: MonthGr
   const rowCount = cells.length / 7
 
   return (
-    <Card variant="container" className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-0 shadow-elevation-1">
+    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
       <div className="grid shrink-0 grid-cols-7 border-b border-neutral-border/50 bg-neutral-bg/30">
         {weekdays.map((d) => (
           <div
@@ -54,7 +54,7 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate }: MonthGr
                 <span
                   className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-0.5 text-[11px] font-medium tabular-nums ${
                     cell.isToday
-                      ? 'bg-brand-teal font-semibold text-white shadow-elevation-1'
+                      ? 'bg-brand-teal font-semibold text-white'
                       : isMuted
                         ? 'text-neutral-muted/45'
                         : 'text-neutral-text'

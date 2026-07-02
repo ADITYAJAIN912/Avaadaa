@@ -1,9 +1,13 @@
+@import './design-system/tokens.css';
+@import './design-system/components.css';
+@import './design-system/workspace.css';
 @import 'tailwindcss';
 @config '../tailwind.config.ts';
 
 @layer base {
   body {
-    @apply m-0 bg-neutral-bg font-sans text-neutral-text antialiased;
+    @apply m-0 bg-surface-canvas font-sans text-neutral-text antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   #root {
@@ -16,8 +20,9 @@
     @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-teal/40 focus-visible:ring-offset-2;
   }
 
+  /* @deprecated Use ds-transition-colors */
   .ease-premium {
-    @apply transition-all duration-200 ease-out;
+    transition: var(--transition-colors);
   }
 
   /* Typography hierarchy */
@@ -30,7 +35,7 @@
   }
 
   .text-meta {
-    @apply text-caption text-neutral-muted;
+    @apply text-caption text-neutral-muted/90;
   }
 
   /* Inputs */
@@ -38,17 +43,13 @@
     @apply w-full rounded-xl border border-neutral-border/80 bg-white py-2.5 pl-9 pr-4 text-body text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/50 focus:shadow-elevation-2 focus:ring-2 focus:ring-brand-teal/20;
   }
 
-  .search-input {
-    @apply h-9 w-full rounded-xl border border-neutral-border/70 bg-white py-0 pl-10 pr-14 text-body leading-none text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/40 focus:shadow-elevation-1 focus:ring-2 focus:ring-brand-teal/20 md:pr-[4.25rem];
-  }
-
-  /* Surfaces */
+  /* Surfaces — one elevation level (shadow-sm); avoid stacking shadows */
   .card-surface {
-    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out;
+    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
   }
 
   .card-surface-interactive {
-    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out hover:border-brand-teal/20 hover:shadow-elevation-1;
+    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm transition-colors duration-200 ease-out hover:border-brand-teal/25;
   }
 
   .card-hover-lift {
@@ -56,15 +57,29 @@
   }
 
   .card-surface-primary {
-    @apply rounded-xl border border-brand-teal/12 bg-white shadow-elevation-1 ring-1 ring-brand-teal/5 transition-all duration-200 ease-out;
+    @apply rounded-xl border border-brand-teal/15 bg-white shadow-sm;
   }
 
   .card-surface-secondary {
-    @apply rounded-xl border border-neutral-border/70 bg-neutral-bg/50 shadow-elevation-1 transition-all duration-200 ease-out;
+    @apply rounded-xl border border-neutral-border/60 bg-neutral-bg/40 shadow-sm;
+  }
+
+  /** Outer shell — shadow lives here; never add overflow-hidden on this node */
+  .panel-surface {
+    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
+  }
+
+  .panel-surface-accent {
+    @apply border-brand-teal/15;
+  }
+
+  /** Inner clip — pairs with panel-surface / Card container */
+  .surface-clip {
+    @apply min-h-0 flex-1 overflow-hidden rounded-xl;
   }
 
   .container-surface {
-    @apply rounded-xl border border-neutral-border/70 bg-white shadow-elevation-1 transition-all duration-200 ease-out;
+    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
   }
 
   /* Rows */
@@ -93,17 +108,22 @@
     @apply transition-all duration-200 ease-out hover:shadow-elevation-1 active:scale-[0.99];
   }
 
-  /* Chips */
+  /* Chips — standalone only; grouped filters use SegmentedControl */
   .chip {
-    @apply inline-flex h-9 items-center rounded-full px-3.5 text-body font-medium transition-all duration-200 ease-out;
+    @apply inline-flex h-8 items-center rounded-lg px-3 text-caption font-medium transition-all duration-200 ease-out;
   }
 
   .chip-active {
-    @apply bg-brand-teal text-white shadow-elevation-1;
+    @apply bg-brand-teal text-white;
   }
 
   .chip-inactive {
-    @apply border border-neutral-border/70 bg-white text-neutral-muted hover:border-brand-teal/20 hover:bg-brand-tealLight/40 hover:text-neutral-text;
+    @apply bg-neutral-bg/70 text-neutral-muted ring-1 ring-inset ring-neutral-border/50 hover:text-neutral-text;
+  }
+
+  /* Toolbar cluster — deprecated; prefer SegmentedControl */
+  .toolbar-cluster {
+    @apply flex h-9 items-center gap-0.5 rounded-lg bg-neutral-bg/70 p-0.5 ring-1 ring-inset ring-neutral-border/50;
   }
 
   /* Badges */
@@ -112,7 +132,7 @@
   }
 
   .badge-group {
-    @apply inline-flex h-6 shrink-0 items-center gap-1 rounded-lg bg-neutral-bg/90 px-2 ring-1 ring-neutral-border/50;
+    @apply inline-flex h-6 shrink-0 items-center gap-1.5;
   }
 
   /* Navigation */
@@ -121,11 +141,6 @@
   }
 
   .nav-item-active {
-    @apply bg-brand-tealLight font-medium text-brand-teal shadow-elevation-1 ring-1 ring-brand-teal/8;
-  }
-
-  /* Toolbar cluster */
-  .toolbar-cluster {
-    @apply flex h-9 items-center gap-0.5 rounded-xl border border-neutral-border/70 bg-neutral-bg/50 p-0.5;
+    @apply bg-brand-tealLight/80 font-medium text-brand-teal;
   }
 }

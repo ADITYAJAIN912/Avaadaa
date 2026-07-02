@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { CalendarFilterCategory, CalendarViewMode } from '../../types/calendar'
 import { Button } from '../ui/Button'
-import { Card } from '../ui/Card'
+import { SegmentedControl } from '../ui/SegmentedControl'
 
 const filters: { value: CalendarFilterCategory; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -30,34 +30,18 @@ function CalendarViewToggle({
   view: CalendarViewMode
   onViewChange: (view: CalendarViewMode) => void
 }) {
-  const options: { value: CalendarViewMode; label: string }[] = [
-    { value: 'month', label: 'Month' },
-    { value: 'week', label: 'Week' },
-    { value: 'day', label: 'Day' },
-  ]
-
   return (
-    <div
-      role="group"
-      aria-label="Calendar view"
-      className="inline-flex h-7 shrink-0 items-center rounded-lg border border-neutral-border/70 bg-white p-px shadow-elevation-1"
-    >
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onViewChange(opt.value)}
-          aria-pressed={view === opt.value}
-          className={`focus-ring inline-flex h-[26px] min-w-[2.75rem] items-center justify-center rounded-md px-2 text-[11px] font-medium ease-premium ${
-            view === opt.value
-              ? 'bg-brand-tealLight text-brand-teal shadow-elevation-1'
-              : 'text-neutral-muted hover:bg-neutral-bg/80 hover:text-neutral-text'
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
+    <SegmentedControl
+      size="sm"
+      ariaLabel="Calendar view"
+      options={[
+        { value: 'month', label: 'Month' },
+        { value: 'week', label: 'Week' },
+        { value: 'day', label: 'Day' },
+      ]}
+      value={view}
+      onChange={onViewChange}
+    />
   )
 }
 
@@ -73,7 +57,7 @@ export function CalendarToolbar({
   onNextMonth,
 }: CalendarToolbarProps) {
   return (
-    <Card variant="default" className="shrink-0 rounded-xl px-2 py-1.5 shadow-elevation-1">
+    <div className="panel-surface shrink-0 px-2 py-1.5">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         {/* Navigation cluster */}
         <div className="flex shrink-0 items-center gap-1">
@@ -115,29 +99,13 @@ export function CalendarToolbar({
           aria-label="Filter events"
           className="flex min-w-0 flex-1 basis-full items-center sm:basis-auto"
         >
-          <div className="inline-flex h-7 max-w-full flex-wrap items-center rounded-lg border border-neutral-border/70 bg-neutral-bg/40 p-px">
-            {filters.map((f, i) => (
-              <span key={f.value} className="flex items-center">
-                {i > 0 && (
-                  <span className="mx-px text-[10px] text-neutral-border/80" aria-hidden>
-                    |
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => onCategoryChange(f.value)}
-                  aria-pressed={categoryFilter === f.value}
-                  className={`focus-ring rounded-md px-2 py-0.5 text-[11px] font-medium ease-premium ${
-                    categoryFilter === f.value
-                      ? 'bg-white text-neutral-text shadow-elevation-1'
-                      : 'text-neutral-muted hover:text-neutral-text'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              </span>
-            ))}
-          </div>
+          <SegmentedControl
+            size="sm"
+            options={filters}
+            value={categoryFilter}
+            onChange={onCategoryChange}
+            ariaLabel="Filter events by category"
+          />
         </div>
 
         {/* View switcher */}
@@ -145,6 +113,6 @@ export function CalendarToolbar({
           <CalendarViewToggle view={view} onViewChange={onViewChange} />
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

@@ -101,10 +101,7 @@ export function ExecutiveBriefSidebar({
   const agendaOverflow = todayEvents.length - visibleAgenda.length
 
   return (
-    <Card
-      variant="default"
-      className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-0 shadow-elevation-1"
-    >
+    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
       <header className="shrink-0 border-b border-neutral-border/50 bg-neutral-bg/25 p-2">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-muted">
           Executive Daily Brief

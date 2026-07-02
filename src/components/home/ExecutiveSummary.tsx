@@ -19,7 +19,7 @@ export function ExecutiveSummary({
   const firstName = userName.split(' ')[0]
 
   return (
-    <header className="card-surface flex flex-col gap-2.5 px-3.5 py-2.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <header className="panel-surface flex flex-col gap-2.5 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <p className="text-[11px] text-neutral-muted">Good morning,</p>
         <h1 className="text-page-title font-semibold tracking-tight text-neutral-text">

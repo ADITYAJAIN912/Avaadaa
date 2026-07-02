@@ -42,10 +42,11 @@ export function KanbanColumn({ title, items }: KanbanColumnProps) {
 
   return (
     <div
-      className={`flex w-[17.5rem] shrink-0 flex-col self-start overflow-hidden rounded-lg border border-neutral-border/60 border-l-2 bg-white/90 shadow-sm ${theme.accent} ${
+      className={`panel-surface flex w-[17.5rem] shrink-0 flex-col self-start border-l-2 ${theme.accent} ${
         items.length > 0 ? 'max-h-[calc(100dvh-12.5rem)]' : ''
       }`}
     >
+      <div className="surface-clip flex min-h-0 flex-1 flex-col">
       <header
         className={`sticky top-0 z-10 shrink-0 border-b border-neutral-border/40 px-2.5 py-2 ${theme.header}`}
       >
@@ -88,6 +89,7 @@ export function KanbanColumn({ title, items }: KanbanColumnProps) {
             {expanded ? 'Show less' : `Show ${hiddenCount} more`}
           </button>
         )}
+      </div>
       </div>
     </div>
   )

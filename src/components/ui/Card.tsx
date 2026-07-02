@@ -10,10 +10,9 @@ interface CardProps extends HTMLAttributes<HTMLElement> {
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type']
 }
 
-const variantClasses: Record<CardVariant, string> = {
+const variantClasses: Record<Exclude<CardVariant, 'container'>, string> = {
   default: 'card-surface',
-  interactive: 'card-surface-interactive card-hover-lift',
-  container: 'container-surface',
+  interactive: 'card-surface-interactive',
 }
 
 export function Card({
@@ -24,6 +23,14 @@ export function Card({
   type,
   ...props
 }: CardProps) {
+  if (variant === 'container') {
+    return (
+      <Tag className={`panel-surface flex flex-col ${className}`} {...props}>
+        <div className="surface-clip flex min-h-0 flex-1 flex-col">{children}</div>
+      </Tag>
+    )
+  }
+
   return (
     <Tag
       className={`${variantClasses[variant]} ${className}`}

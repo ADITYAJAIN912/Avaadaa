@@ -33,13 +33,54 @@ export function HomePageSkeleton() {
 
 export function MeetingsPageSkeleton() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <Skeleton className="h-11 w-full rounded-xl" />
-      <Skeleton className="h-12 w-full rounded-xl" />
-      <Skeleton className="h-14 w-full rounded-xl" />
-      <div className="space-y-3">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-56 w-full rounded-2xl" />
+    <div className="mx-auto flex h-[calc(100dvh-8.25rem)] max-w-[90rem] flex-col gap-2 overflow-hidden">
+      <div className="panel-surface shrink-0 px-4 py-2">
+        <div className="ds-skeleton h-5 w-56 rounded-md" />
+        <div className="ds-skeleton mt-2 h-3 w-40 rounded-md" />
+        <div className="mt-3 flex gap-2">
+          <div className="ds-skeleton h-8 w-48 rounded-lg" />
+          <div className="ds-skeleton ml-auto h-8 w-52 rounded-lg" />
+        </div>
+      </div>
+
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-[minmax(0,23fr)_minmax(0,58fr)_minmax(0,19fr)]">
+        <div className="panel-surface flex max-h-[42vh] flex-col lg:max-h-none">
+          <div className="bg-surface-sunken/50 px-4 py-2">
+            <div className="ds-skeleton h-4 w-28 rounded-md" />
+            <div className="ds-skeleton mt-1.5 h-3 w-20 rounded-md" />
+          </div>
+          <div className="space-y-2 p-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="ds-skeleton h-16 rounded-lg" />
+            ))}
+          </div>
+        </div>
+
+        <div className="panel-surface flex min-h-0 flex-col">
+          <div className="bg-surface-sunken/50 px-4 py-2">
+            <div className="ds-skeleton h-3 w-24 rounded-md" />
+            <div className="ds-skeleton mt-1.5 h-5 w-3/4 max-w-md rounded-md" />
+            <div className="ds-skeleton mt-1.5 h-3 w-40 rounded-md" />
+          </div>
+          <div className="space-y-3 p-4">
+            <div className="ds-skeleton h-36 rounded-lg" />
+            <div className="ds-skeleton h-24 rounded-lg" />
+            <div className="ds-skeleton h-20 rounded-lg" />
+            <div className="ds-skeleton h-20 rounded-lg" />
+          </div>
+        </div>
+
+        <div className="panel-surface hidden min-h-0 flex-col lg:flex">
+          <div className="bg-surface-sunken/50 px-4 py-2">
+            <div className="ds-skeleton h-4 w-20 rounded-md" />
+            <div className="ds-skeleton mt-1.5 h-3 w-32 rounded-md" />
+          </div>
+          <div className="space-y-2 p-3">
+            <div className="ds-skeleton h-24 rounded-lg" />
+            <div className="ds-skeleton h-32 rounded-lg" />
+            <div className="ds-skeleton h-28 rounded-lg" />
+          </div>
+        </div>
       </div>
     </div>
   )

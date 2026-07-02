@@ -24,7 +24,7 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
   const nextMeeting = meetingEvents[0]
 
   return (
-    <Card variant="container" className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-0 shadow-elevation-1">
+    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
       <header className="shrink-0 border-b border-neutral-border/50 bg-neutral-bg/25 px-4 py-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -37,7 +37,7 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
             </p>
           </div>
           {nextMeeting && (
-            <div className="rounded-xl border border-neutral-border/50 bg-white px-3 py-2 shadow-elevation-1">
+            <div className="rounded-lg border border-neutral-border/50 bg-white px-3 py-2">
               <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-muted">
                 {isToday ? 'Up next' : 'Opens with'}
               </p>

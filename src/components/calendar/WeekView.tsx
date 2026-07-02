@@ -27,7 +27,7 @@ export function WeekView({
   const weekdays = getWeekdayLabels()
 
   return (
-    <Card variant="container" className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-0 shadow-elevation-1">
+    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
       {/* Day headers */}
       <div
         className="grid shrink-0 border-b border-neutral-border/50 bg-neutral-bg/30"

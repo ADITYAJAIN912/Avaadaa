@@ -32,7 +32,7 @@ export function UpcomingRow({ meeting, onAutoJoinChange, isLast = false }: Upcom
           aria-hidden
         />
         {!isLast && (
-          <span className="mt-1 w-px flex-1 bg-neutral-border/50" aria-hidden />
+          <span className="mt-1 w-px min-h-[0.75rem] flex-1 max-h-full bg-neutral-border/50" aria-hidden />
         )}
       </div>
 
@@ -77,47 +77,49 @@ export function UpcomingSection({
 }: UpcomingSectionProps) {
   return (
     <section
-      className={`card-surface-primary flex min-h-0 flex-col overflow-hidden p-3 shadow-sm ease-premium hover:shadow-md ${className}`}
+      className={`panel-surface panel-surface-accent flex h-full min-h-0 flex-col ${className}`}
     >
-      <div className="flex shrink-0 items-center justify-between gap-2">
-        <h2 className="text-section-title">Upcoming Meetings</h2>
-        {meetings.length > 0 && (
-          <span className="rounded-md bg-brand-tealLight/70 px-1.5 py-px text-[10px] font-medium tabular-nums text-brand-teal">
-            {meetings.length}
-          </span>
-        )}
-      </div>
+      <div className="surface-clip flex min-h-0 flex-1 flex-col p-3">
+        <div className="flex shrink-0 items-center justify-between gap-2">
+          <h2 className="text-section-title">Upcoming Meetings</h2>
+          {meetings.length > 0 && (
+            <span className="rounded-md bg-brand-tealLight/70 px-1.5 py-px text-[10px] font-medium tabular-nums text-brand-teal">
+              {meetings.length}
+            </span>
+          )}
+        </div>
 
-      <div className="mt-2 min-h-0 flex-1 overflow-y-auto">
-        {meetings.length === 0 ? (
-          <EmptyState
-            bare
-            icon={Calendar}
-            title="No upcoming meetings"
-            description="You're all caught up for the rest of today."
-            actionHint="View the full schedule on the Meetings page."
-            className="py-5"
-          />
-        ) : (
-          <ul aria-label="Upcoming meetings timeline">
-            {meetings.map((m, i) => (
-              <UpcomingRow
-                key={m.id}
-                meeting={m}
-                onAutoJoinChange={onAutoJoinChange}
-                isLast={i === meetings.length - 1}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
+        <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {meetings.length === 0 ? (
+            <EmptyState
+              bare
+              icon={Calendar}
+              title="No upcoming meetings"
+              description="You're all caught up for the rest of today."
+              actionHint="View the full schedule on the Meetings page."
+              className="py-5"
+            />
+          ) : (
+            <ul aria-label="Upcoming meetings timeline">
+              {meetings.map((m, i) => (
+                <UpcomingRow
+                  key={m.id}
+                  meeting={m}
+                  onAutoJoinChange={onAutoJoinChange}
+                  isLast={i === meetings.length - 1}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
 
-      <Link
-        to="/meetings"
-        className="focus-ring mt-2 inline-block shrink-0 rounded-md text-[11px] font-medium text-brand-teal ease-premium hover:text-brand-teal/80"
-      >
-        View all meetings →
-      </Link>
+        <Link
+          to="/meetings"
+          className="focus-ring mt-2 inline-block shrink-0 rounded-md text-[11px] font-medium text-brand-teal ease-premium hover:text-brand-teal/80"
+        >
+          View all meetings →
+        </Link>
+      </div>
     </section>
   )
 }
