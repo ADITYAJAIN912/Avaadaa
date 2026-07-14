@@ -10,7 +10,7 @@ import { WeekView } from '../components/calendar/WeekView'
 import { DayView } from '../components/calendar/DayView'
 import { EventSheet } from '../components/calendar/EventSheet'
 import { CALENDAR_CATEGORIES } from '../components/calendar/categoryTheme'
-import { LoadingScreen } from '../components/ui/LoadingScreen'
+import { CalendarSkeleton } from '../components/ui/PageSkeletons'
 import { usePageLoading } from '../hooks/usePageLoading'
 
 const initial = parseYearMonth(TODAY.slice(0, 7))
@@ -56,12 +56,24 @@ export function CalendarPage() {
   }
 
   function goPrevMonth() {
+    if (view === 'week') {
+      const date = new Date(`${selectedDate}T00:00:00`)
+      date.setDate(date.getDate() - 7)
+      handleSelectDate(date.toISOString().split('T')[0])
+      return
+    }
     const next = shiftMonth(year, month, -1)
     setYear(next.year)
     setMonth(next.month)
   }
 
   function goNextMonth() {
+    if (view === 'week') {
+      const date = new Date(`${selectedDate}T00:00:00`)
+      date.setDate(date.getDate() + 7)
+      handleSelectDate(date.toISOString().split('T')[0])
+      return
+    }
     const next = shiftMonth(year, month, 1)
     setYear(next.year)
     setMonth(next.month)
@@ -102,10 +114,10 @@ export function CalendarPage() {
 
   const closeSheet = useCallback(() => setSelectedEventId(null), [])
 
-  if (isLoading) return <LoadingScreen message="Gathering your schedule..." />
+  if (isLoading) return <CalendarSkeleton />
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3.5 pb-10">
+    <div className="flex flex-1 min-h-0 w-full flex-col gap-3.5 pb-2">
       <CalendarToolbar
         monthLabel={formatMonthYear(year, month)}
         selectedDate={selectedDate}
@@ -121,8 +133,8 @@ export function CalendarPage() {
         onNextMonth={goNextMonth}
       />
 
-      <main className="flex-1 min-h-0 overflow-hidden">
-        <div className="min-w-[768px] md:min-w-0 h-full">
+      <main className="flex flex-1 min-h-0 flex-col overflow-hidden">
+        <div className="flex flex-1 min-h-0 flex-col min-w-[768px] md:min-w-0">
           {view === 'month' && <MonthGrid key={`month-${year}-${month}`} cells={monthCells} events={filteredEvents} selectedDate={selectedDate} onSelectDate={handleSelectDate} onSelectEvent={handleSelectEvent} onPeekDate={handlePeekDate} />}
           {view === 'week' && <WeekView key={`week-${weekDates[0]}`} weekDates={weekDates} events={filteredEvents} selectedEventId={selectedEventId} onSelectEvent={handleSelectEvent} />}
           {view === 'day' && <DayView key={`day-${selectedDate}`} date={selectedDate} events={dayEvents} selectedEventId={selectedEventId} onSelectEvent={handleSelectEvent} />}

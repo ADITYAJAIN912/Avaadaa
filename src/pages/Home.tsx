@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LoadingScreen } from '../components/ui/LoadingScreen'
+import { CheckCircle2, CalendarCheck } from 'lucide-react'
+import { HomeSkeleton } from '../components/ui/PageSkeletons'
 import { useActionItems } from '../context/ActionItemsContext'
 import { useDashboardInsights } from '../context/DashboardInsightsContext'
 import { useMeetings } from '../context/MeetingsContext'
@@ -44,6 +45,12 @@ function scheduleChip(meeting: Meeting): { label: string; className: string } {
   return { label: 'Upcoming', className: 'bg-status-warningMuted text-status-warning' }
 }
 
+function getHeroBadgeText(meeting: Meeting | null): string {
+  if (!meeting) return 'schedule clear'
+  if (isInProgress(meeting)) return 'happening now'
+  return `up next · ${untilLabel(meeting)}`
+}
+
 function actionChip(item: { date: string }): { label: string; className: string } {
   if (item.date < TODAY) {
     const days = Math.max(1, Math.round((new Date(`${TODAY}T00:00:00`).getTime() - new Date(`${item.date}T00:00:00`).getTime()) / 86400000))
@@ -54,6 +61,7 @@ function actionChip(item: { date: string }): { label: string; className: string 
 }
 
 export function Home() {
+  const [showAllSchedule, setShowAllSchedule] = useState(false)
   const isLoading = usePageLoading(400)
   const { meetings, upcomingForHome } = useMeetings()
   const { openActionStats, topOpenActionItems } = useActionItems()
@@ -82,7 +90,7 @@ export function Home() {
     .replace(',', ' ·')
 
   if (isLoading) {
-    return <LoadingScreen message="Curating your day..." />
+    return <HomeSkeleton />
   }
 
   const attendees = nextMeeting ? getDisplayAttendees(nextMeeting) : []
@@ -112,8 +120,10 @@ export function Home() {
           <span className="pointer-events-none absolute -right-[70px] -top-[70px] h-[260px] w-[260px] rounded-full border-[36px] border-[rgba(239,238,231,0.06)]" aria-hidden />
           <div>
             <p className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#A7C6AF]">
-              <span className="pulse-live h-[7px] w-[7px] rounded-full bg-[#8FD1A5]" aria-hidden />
-              Up next · {nextMeeting ? untilLabel(nextMeeting) : 'schedule clear'}
+              {nextMeeting && isInProgress(nextMeeting) && (
+                <span className="pulse-live h-[7px] w-[7px] rounded-full bg-[#8FD1A5]" aria-hidden />
+              )}
+              {getHeroBadgeText(nextMeeting)}
             </p>
             <h2 className="mb-1 mt-2.5 text-display-sm font-extrabold tracking-[-0.02em]">
               {nextMeeting ? nextMeeting.title : 'Your schedule is clear'}
@@ -142,7 +152,7 @@ export function Home() {
             </div>
             <button
               type="button"
-              className="focus-ring rounded-[12px] bg-surface-canvas px-5 py-[11px] text-body font-bold text-brand-teal transition-transform duration-200 hover:scale-105"
+              className="focus-ring rounded-[12px] bg-surface-canvas px-5 py-[11px] text-body font-bold text-brand-teal transition-all duration-200 hover:scale-105 active:scale-95"
             >
               Join meeting →
             </button>
@@ -155,11 +165,11 @@ export function Home() {
             Actions due
             <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-surface-accent text-[12px] text-brand-teal">☑</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-3">
-            <p className="text-[2rem] font-extrabold leading-none tracking-[-0.04em] text-neutral-text tabular-nums">
+          <div className="mt-2">
+            <p className="text-[1.35rem] font-extrabold leading-tight tracking-[-0.03em] text-neutral-text tabular-nums">
               {openActionStats.dueToday + openActionStats.overdue}
             </p>
-            <p className={`text-small font-bold ${openActionStats.overdue > 0 ? 'text-coral' : 'text-neutral-muted'}`}>
+            <p className={`mt-0.5 text-small font-bold ${openActionStats.overdue > 10 ? 'text-coral' : 'text-neutral-muted'}`}>
               {openActionStats.overdue > 0 ? `${openActionStats.overdue} overdue` : 'All clear'}
             </p>
           </div>
@@ -189,31 +199,44 @@ export function Home() {
           </div>
           <div className="flex-1 overflow-y-auto">
             {todayMeetings.length === 0 ? (
-              <p className="border-t border-[var(--border-subtle)] px-[22px] py-6 text-body text-neutral-muted">
-                No meetings today. Your calendar is open.
-              </p>
+              <div className="flex flex-col items-center justify-center border-t border-[var(--border-subtle)] px-[22px] py-12 text-center text-neutral-muted">
+                <CalendarCheck className="mb-3 h-8 w-8 opacity-50" strokeWidth={1.5} />
+                <p className="text-body font-medium">No meetings today.</p>
+                <p className="text-small">Your calendar is open.</p>
+              </div>
             ) : (
-              todayMeetings.map((meeting) => {
-                const chip = scheduleChip(meeting)
-                return (
-                  <Link
-                    key={meeting.id}
-                    to="/meetings"
-                    className="focus-ring flex cursor-pointer items-center gap-[15px] border-t border-[var(--border-subtle)] px-[22px] py-[13px] transition-colors duration-150 hover:bg-[#F3F3EA]"
-                  >
-                    <span className="min-w-[84px] font-mono text-[11.5px] text-neutral-muted tabular-nums">
-                      {meeting.time}–{formatEndTime(meeting)}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-body-lg font-bold text-neutral-text">{meeting.title}</span>
-                      <span className="mt-px block truncate text-small font-medium text-neutral-muted">
-                        {getPlatformLabel(meeting.source)} · {meeting.attendees.length} people
+              <>
+                {(showAllSchedule ? todayMeetings : todayMeetings.slice(0, 3)).map((meeting) => {
+                  const chip = scheduleChip(meeting)
+                  return (
+                    <Link
+                      key={meeting.id}
+                      to="/meetings"
+                      className="group focus-ring flex cursor-pointer items-center gap-[15px] border-t border-[var(--border-subtle)] px-[22px] py-[13px] transition-all duration-200 hover:bg-[#F3F3EA]"
+                    >
+                      <span className="min-w-[84px] font-mono text-[11.5px] text-neutral-muted tabular-nums transition-transform duration-200 group-hover:translate-x-1">
+                        {meeting.time}–{formatEndTime(meeting)}
                       </span>
-                    </span>
-                    <span className={`rounded-full px-[11px] py-1 text-micro font-bold ${chip.className}`}>{chip.label}</span>
-                  </Link>
-                )
-              })
+                      <span className="min-w-0 flex-1 transition-transform duration-200 group-hover:translate-x-1">
+                        <span className="block truncate text-body-lg font-bold text-neutral-text">{meeting.title}</span>
+                        <span className="mt-px block truncate text-small font-medium text-neutral-muted">
+                          {getPlatformLabel(meeting.source)} · {meeting.attendees.length} people
+                        </span>
+                      </span>
+                      <span className={`rounded-full px-[11px] py-1 text-micro font-bold ${chip.className}`}>{chip.label}</span>
+                    </Link>
+                  )
+                })}
+                {todayMeetings.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllSchedule((prev) => !prev)}
+                    className="focus-ring w-full border-t border-[var(--border-subtle)] py-3.5 text-center text-caption font-bold text-brand-teal transition-colors hover:bg-surface-accent"
+                  >
+                    {showAllSchedule ? 'Show less' : `Show ${todayMeetings.length - 3} more`}
+                  </button>
+                )}
+              </>
             )}
           </div>
         </section>
@@ -230,49 +253,27 @@ export function Home() {
             </div>
             <div className="flex-1 overflow-y-auto">
               {dueActions.length === 0 ? (
-                <p className="border-t border-[var(--border-subtle)] px-[22px] py-6 text-body text-neutral-muted">
-                  Nothing due. Enjoy the clear runway.
-                </p>
+                <div className="flex flex-col items-center justify-center border-t border-[var(--border-subtle)] px-[22px] py-12 text-center text-neutral-muted">
+                  <CheckCircle2 className="mb-3 h-8 w-8 text-brand-teal/60 opacity-80" strokeWidth={1.5} />
+                  <p className="text-body font-medium">Nothing due.</p>
+                  <p className="text-small">Enjoy the clear runway.</p>
+                </div>
               ) : (
                 dueActions.map((item) => {
                   const chip = actionChip(item)
                   return (
-                    <div key={item.id} className="flex items-center gap-3 border-t border-[var(--border-subtle)] px-[22px] py-3">
+                    <div key={item.id} className="group flex items-center gap-3 border-t border-[var(--border-subtle)] px-[22px] py-3 transition-colors duration-200 hover:bg-neutral-bg/40">
                       <span
-                        className="h-[18px] w-[18px] shrink-0 cursor-pointer rounded-[6px] border-[1.5px] border-[var(--border-strong)] transition-all duration-150 hover:border-brand-teal hover:bg-surface-accent"
+                        className="h-[18px] w-[18px] shrink-0 cursor-pointer rounded-[6px] border-[1.5px] border-[var(--border-strong)] transition-all duration-200 hover:border-brand-teal hover:bg-surface-accent active:scale-90 group-hover:border-brand-teal/50"
                         aria-hidden
                       />
-                      <span className="min-w-0 flex-1 truncate text-body font-semibold text-neutral-text">{item.meetingTitle}</span>
+                      <span className="min-w-0 flex-1 truncate text-body font-semibold text-neutral-text transition-transform duration-200 group-hover:translate-x-1">{item.meetingTitle}</span>
                       <span className={`rounded-full px-[11px] py-1 text-micro font-bold ${chip.className}`}>{chip.label}</span>
                     </div>
                   )
                 })
               )}
             </div>
-          </section>
-
-          {/* AI Companion tile */}
-          <section className="reveal reveal-6 shrink-0 rounded-lg border border-brand-teal/20 bg-brand-tealLight/50 p-[22px] transition-all duration-200 ease-out hover:-translate-y-[3px] hover:shadow-elevation-2">
-            <div className="mb-2.5 flex items-center gap-2.5">
-              <span className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-brand-teal text-[14px] text-white shadow-[var(--shadow-glow-accent)]">✦</span>
-              <span className="text-body-lg font-extrabold text-brand-navy">AI Companion</span>
-            </div>
-            <p className="text-[13px] font-medium leading-[1.6] text-neutral-text">
-              {nextMeeting ? (
-                <>
-                  Prep notes for <b className="font-bold text-brand-teal">{nextMeeting.title}</b> are ready.{' '}
-                </>
-              ) : null}
-              {openActionStats.overdue > 0
-                ? `${openActionStats.overdue} overdue action${openActionStats.overdue === 1 ? '' : 's'} — clear ${openActionStats.overdue === 1 ? 'it' : 'them'} before your next session.`
-                : 'No overdue actions — you are on track for today.'}
-            </p>
-            <button
-              type="button"
-              className="focus-ring mt-[13px] rounded-[12px] border border-neutral-border bg-surface px-4 py-2 text-caption font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal"
-            >
-              ▸ Play 60-sec brief
-            </button>
           </section>
         </div>
       </div>

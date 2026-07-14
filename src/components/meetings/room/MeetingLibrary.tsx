@@ -1,7 +1,9 @@
+import { useRef } from 'react'
 import { CalendarDays, Download, Users } from 'lucide-react'
 import type { Meeting } from '../../../types/meeting'
 import { TODAY } from '../../../data/constants'
 import { formatDisplayDate, getDayGroup } from '../../../utils/helpers'
+import { isMeetingLive } from '../../../utils/meetings'
 import type { DateFilter } from '../FilterChips'
 import { SearchInput } from '../../ui/SearchInput'
 import { EmptyState } from '../../ui/EmptyState'
@@ -37,28 +39,45 @@ type StatusStyle = {
   label: string
 }
 
+/**
+ * Visual Status System for Meetings:
+ * 
+ * The accent color (left vertical bar) and the status pill convey the state of the meeting:
+ * 
+ * 1. Completed / Summary Ready:
+ *    - Accent: Teal (bg-brand-teal)
+ *    - Meaning: The meeting has ended and AI processing is complete. A summary/recording is available.
+ * 
+ * 2. Live Now:
+ *    - Accent: Green (bg-[#8FD1A5])
+ *    - Meaning: The meeting is currently active in real-time.
+ * 
+ * 3. Upcoming:
+ *    - Accent: Orange (bg-status-warning)
+ *    - Meaning: The meeting is scheduled for the future but hasn't started yet.
+ */
 function getStatusStyle(meeting: Meeting): StatusStyle {
   if (meeting.status === 'Completed') {
     return {
       accent: 'bg-brand-teal',
       badge: 'bg-surface-accent text-brand-teal',
       badgeText: 'bg-surface-accent',
-      label: 'Summary ready',
+      label: 'SUMMARY READY',
     }
   }
-  if (meeting.status === 'Scheduled') {
+  if (isMeetingLive(meeting)) {
     return {
       accent: 'bg-[#8FD1A5]',
       badge: 'bg-[#E8F5EC] text-[#2A7A4A]',
       badgeText: 'bg-[#E8F5EC]',
-      label: 'Live now',
+      label: 'LIVE NOW',
     }
   }
   return {
     accent: 'bg-status-warning',
     badge: 'bg-status-warningMuted text-status-warning',
     badgeText: 'bg-status-warningMuted',
-    label: 'Upcoming',
+    label: 'UPCOMING',
   }
 }
 
@@ -72,6 +91,8 @@ export function MeetingLibrary({
   onCustomDateChange,
   onSelectMeeting,
 }: MeetingLibraryProps) {
+  const dateInputRef = useRef<HTMLInputElement>(null)
+
   const groups = meetings.reduce<Array<{ heading: string; items: Meeting[] }>>((acc, meeting) => {
     const heading = groupHeading(meeting.date)
     const current = acc.find((group) => group.heading === heading)
@@ -131,13 +152,21 @@ export function MeetingLibrary({
           </div>
 
           {dateFilter === 'custom' && (
-            <input
-              type="date"
-              aria-label="Pick meeting date"
-              value={customDate}
-              onChange={(e) => onCustomDateChange(e.target.value)}
-              className="focus-ring shrink-0 rounded-full border border-neutral-border bg-surface px-4 py-2 font-mono text-small text-neutral-text tabular-nums transition-all duration-200 hover:border-brand-teal"
-            />
+            <div 
+              onClick={() => dateInputRef.current?.showPicker()}
+              className="relative flex shrink-0 items-center justify-center gap-2 rounded-full border border-neutral-border bg-surface px-4 py-1.5 text-body font-semibold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:shadow-sm focus-within:ring-2 focus-within:ring-brand-teal/30 focus-within:border-brand-teal cursor-pointer"
+            >
+              <CalendarDays className="h-4 w-4 text-brand-teal" />
+              <span className="font-mono tabular-nums">{formatDisplayDate(customDate)}</span>
+              <input
+                ref={dateInputRef}
+                type="date"
+                aria-label="Pick meeting date"
+                value={customDate}
+                onChange={(e) => onCustomDateChange(e.target.value)}
+                className="absolute inset-0 h-full w-full opacity-0 cursor-pointer pointer-events-none"
+              />
+            </div>
           )}
         </div>
       </header>
@@ -287,6 +316,14 @@ export function MeetingLibrary({
                 </div>
               </section>
             ))}
+            
+            {/* End of schedule indicator for sparse dates */}
+            {meetings.length > 0 && meetings.length <= 4 && (
+              <div className="reveal flex flex-col items-center justify-center py-12 text-neutral-muted">
+                <CalendarDays className="h-8 w-8 mb-3 opacity-20" />
+                <p className="text-body font-medium">No more meetings scheduled for this day</p>
+              </div>
+            )}
           </div>
         )}
       </div>

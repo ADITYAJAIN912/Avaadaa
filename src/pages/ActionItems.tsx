@@ -15,6 +15,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react'
+import { TODAY } from '../data/constants'
 import type { ActionItemStatus } from '../types/actionItem'
 import type { ActionQueueGroup, ActionWorkspaceItem } from '../types/actionWorkspace'
 import type { DependencyItem } from '../types/workspace'
@@ -86,9 +87,10 @@ function parseDate(value: string): Date | null {
 function formatDueDate(value: string, status: ActionItemStatus): string {
   const dueDate = parseDate(value)
   if (!dueDate) return `Due ${value}`
+  const todayDate = parseDate(TODAY) || new Date()
 
   const dayMs = 24 * 60 * 60 * 1000
-  const diffDays = Math.round((toStartOfDay(dueDate).getTime() - toStartOfDay(new Date()).getTime()) / dayMs)
+  const diffDays = Math.round((toStartOfDay(dueDate).getTime() - toStartOfDay(todayDate).getTime()) / dayMs)
   const dateWords = dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 
   if (status === 'Done') return `Completed · due ${dateWords}`
@@ -101,7 +103,8 @@ function formatDueDate(value: string, status: ActionItemStatus): string {
 
 function isOverdue(item: ActionWorkspaceItem): boolean {
   const dueDate = parseDate(item.dueDate)
-  return item.status !== 'Done' && dueDate !== null && toStartOfDay(dueDate) < toStartOfDay(new Date())
+  const todayDate = parseDate(TODAY) || new Date()
+  return item.status !== 'Done' && dueDate !== null && toStartOfDay(dueDate) < toStartOfDay(todayDate)
 }
 
 function progressWords(progress: number): string {
@@ -152,7 +155,7 @@ function Section({ title, children, count }: { title: string; children: ReactNod
 function ActionCheck({ complete }: { complete: boolean }) {
   return (
     <span
-      className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[6px] border-[1.5px] transition-all duration-fast ease-spring ${
+      className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] transition-all duration-fast ease-spring ${
         complete
           ? 'border-brand-teal bg-brand-teal text-neutral-inverse'
           : 'border-[var(--border-strong)] bg-transparent text-transparent group-hover:border-brand-teal group-hover:bg-surface-accent'
@@ -294,32 +297,33 @@ export function ActionItems() {
     const confidenceWords = `${selected.brief.aiConfidence} confidence`
 
     return (
-      <div className="mx-auto flex h-full min-h-0 w-full flex-col bg-neutral-bg">
-        <header className="shrink-0 pb-5 pt-2">
-          <div className="mx-auto flex max-w-5xl flex-col gap-4 reveal">
-            <button
-              type="button"
-              onClick={() => setSelectedId(null)}
-              className="focus-ring w-fit rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal"
-              aria-label="All actions"
-            >
-              ← All actions
-            </button>
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div className="min-w-0">
-                <p className="kicker mb-2">Action brief</p>
-                <h1 className="text-display-md font-extrabold tracking-tight text-neutral-text">{selected.title}</h1>
-                <p className="mt-2 font-mono text-[11.5px] text-neutral-muted">
-                  {selected.owner} · {departmentLabel[selected.department]} · {selected.project}
-                </p>
+      <div className="flex h-full min-h-0 w-full flex-col overflow-y-auto px-4 py-6 bg-neutral-bg">
+        <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
+          <button
+            type="button"
+            onClick={() => setSelectedId(null)}
+            className="focus-ring w-fit rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal shadow-sm"
+            aria-label="All actions"
+          >
+            ← All actions
+          </button>
+          
+          <article className="reveal flex flex-col rounded-2xl border border-neutral-border/80 bg-surface shadow-md overflow-hidden">
+            <header className="border-b border-neutral-border/60 bg-surface px-8 py-8">
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div className="min-w-0">
+                  <p className="kicker mb-2">Action brief</p>
+                  <h1 className="text-display-md font-extrabold tracking-tight text-neutral-text">{selected.title}</h1>
+                  <p className="mt-2 font-mono text-[11.5px] text-neutral-muted">
+                    {selected.owner} · {departmentLabel[selected.department]} · {selected.project}
+                  </p>
+                </div>
+                <StatusChip status={selected.status} />
               </div>
-              <StatusChip status={selected.status} />
-            </div>
-          </div>
-        </header>
+            </header>
 
-        <main ref={scrollRef} className="flex-1 overflow-y-auto py-2" aria-label="Action item detail">
-          <div className="mx-auto max-w-3xl space-y-6 pb-32">
+            <main ref={scrollRef} className="bg-surface px-8 py-8" aria-label="Action item detail">
+              <div className="space-y-8">
             <Section title="What's happening">
               <div className="rounded-lg bg-[var(--surface-ink)] p-[22px] text-[var(--text-on-ink)]">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -437,42 +441,44 @@ export function ActionItems() {
                 </div>
               </div>
             </Section>
-          </div>
-        </main>
+              </div>
+            </main>
 
-        <div className="sticky bottom-0 z-sticky border-t border-neutral-border bg-surface-raised px-5 py-4 shadow-md reveal-scale">
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-h-6 text-caption text-neutral-muted" role="status">
-              {decision === 'idle' ? 'Choose the next decision for this action.' : `Decision saved: ${decision.replace('-', ' ')}.`}
-            </div>
-            {showRejectConfirm ? (
-              <div className="flex flex-wrap items-center gap-2 rounded-full bg-coral-muted px-3 py-2 text-caption text-coral">
-                <span>Are you sure? The owner will be notified.</span>
-                <button type="button" className="focus-ring rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-coral transition-all duration-200 hover:border-brand-teal hover:text-brand-teal" onClick={() => { setDecision('rejected'); setShowRejectConfirm(false) }}>Confirm</button>
-                <button type="button" className="focus-ring rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal" onClick={() => setShowRejectConfirm(false)}>Cancel</button>
+            <footer className="border-t border-neutral-border/60 bg-surface-raised px-8 py-6">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="text-caption font-medium text-neutral-muted" role="status">
+                  {decision === 'idle' ? 'Choose the next decision for this action.' : `Decision saved: ${decision.replace('-', ' ')}.`}
+                </div>
+                {showRejectConfirm ? (
+                  <div className="flex flex-wrap items-center gap-2 rounded-full bg-coral-muted px-4 py-2 text-caption text-coral">
+                    <span className="font-semibold">Are you sure? The owner will be notified.</span>
+                    <button type="button" className="focus-ring rounded-lg border border-coral bg-surface px-4 py-1.5 font-bold transition-all duration-200 hover:bg-coral hover:text-white" onClick={() => { setDecision('rejected'); setShowRejectConfirm(false) }}>Confirm</button>
+                    <button type="button" className="focus-ring rounded-lg border border-neutral-border bg-surface px-4 py-1.5 font-bold transition-all duration-200 hover:border-neutral-border/80 text-neutral-text" onClick={() => setShowRejectConfirm(false)}>Cancel</button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setDecision('approved')}
+                      className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-brand-teal bg-brand-teal px-5 py-2.5 text-body font-bold text-neutral-inverse transition-all duration-200 hover:-translate-y-px hover:bg-brand-tealHover shadow-sm"
+                    >
+                      <Check className="h-4.5 w-4.5" aria-hidden />
+                      {decision === 'approved' ? '✓ Approved' : 'Approve'}
+                    </button>
+                    <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-border bg-surface px-5 py-2.5 text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal shadow-sm active:scale-95" onClick={() => setDecision('update-requested')}>
+                      <Clock3 className="h-4.5 w-4.5 text-neutral-muted" aria-hidden /> Request update
+                    </button>
+                    <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-border bg-surface px-5 py-2.5 text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal shadow-sm active:scale-95" onClick={() => setDecision('delegated')}>
+                      <UserRound className="h-4.5 w-4.5 text-neutral-muted" aria-hidden /> Delegate
+                    </button>
+                    <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-border bg-surface px-5 py-2.5 text-body font-bold text-coral transition-all duration-200 hover:border-coral hover:text-coral shadow-sm active:scale-95" onClick={() => setShowRejectConfirm(true)}>
+                      <X className="h-4.5 w-4.5" aria-hidden /> Reject
+                    </button>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setDecision('approved')}
-                  className="focus-ring inline-flex items-center justify-center gap-2 rounded-[12px] border border-brand-teal bg-brand-teal px-5 py-[11px] text-body font-bold text-neutral-inverse transition-all duration-200 hover:-translate-y-px hover:bg-brand-tealHover [box-shadow:var(--shadow-glow-accent)]"
-                >
-                  <Check className="h-4 w-4" aria-hidden />
-                  {decision === 'approved' ? '✓ Approved' : 'Approve'}
-                </button>
-                <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal" onClick={() => setDecision('update-requested')}>
-                  <Clock3 className="h-4 w-4" aria-hidden /> Request update
-                </button>
-                <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-neutral-text transition-all duration-200 hover:border-brand-teal hover:text-brand-teal" onClick={() => setDecision('delegated')}>
-                  <UserRound className="h-4 w-4" aria-hidden /> Delegate
-                </button>
-                <button type="button" className="focus-ring inline-flex items-center justify-center gap-2 rounded-[12px] border border-neutral-border bg-surface px-5 py-[11px] text-body font-bold text-coral transition-all duration-200 hover:border-brand-teal hover:text-brand-teal" onClick={() => setShowRejectConfirm(true)}>
-                  <X className="h-4 w-4" aria-hidden /> Reject
-                </button>
-              </div>
-            )}
-          </div>
+            </footer>
+          </article>
         </div>
       </div>
     )
@@ -540,14 +546,13 @@ export function ActionItems() {
                   <div className="flex items-center justify-between px-[22px] pb-3 pt-[18px]">
                     <div className="flex items-center gap-3">
                       {emphasized ? (
-                        <span className="flex items-center gap-2 text-coral">
-                          <span className="h-2 w-2 rounded-full bg-coral pulse-live" aria-hidden />
-                          <AlertTriangle className="h-4 w-4" aria-hidden />
+                        <span className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-status-warning" aria-hidden />
                         </span>
                       ) : (
                         <CircleDashed className="h-4 w-4 text-neutral-muted" aria-hidden />
                       )}
-                      <h2 className={`text-card-title font-extrabold tracking-[-0.01em] ${emphasized ? 'text-coral' : muted ? 'text-neutral-muted' : 'text-neutral-text'}`}>
+                      <h2 className={`text-card-title font-extrabold tracking-[-0.01em] ${muted ? 'text-neutral-muted' : 'text-neutral-text'}`}>
                         {GROUP_LABELS[group]}
                       </h2>
                     </div>

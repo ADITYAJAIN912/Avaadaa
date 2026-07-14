@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef } from 'react'
 import type { CalendarDayCell } from '../../utils/calendar'
 import type { CalendarEvent } from '../../types/calendar'
 import { getEventsForDate, getWeekdayLabels } from '../../utils/calendar'
@@ -15,6 +15,13 @@ interface MonthGridProps {
 
 export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectEvent }: MonthGridProps) {
   const weekdays = getWeekdayLabels()
+  const timelineRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (timelineRef.current) {
+      timelineRef.current.scrollTop = 0
+    }
+  }, [selectedDate])
   
   const agendaEvents = useMemo(() => {
     // Look ahead up to 14 days to provide a dense schedule list
@@ -26,6 +33,23 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectE
       events: getEventsForDate(events, c.date)
     })).filter(group => group.events.length > 0 || group.date === selectedDate)
   }, [cells, events, selectedDate])
+
+  const { todayCount, weekCount } = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0] // or use a passed TODAY constant if available, but since we don't have it imported, we'll just use the first cell's month to approximate, or actually just look at the selectedDate's count? 
+    // Wait, let's use the first cell that has isToday
+    const todayCell = cells.find(c => c.isToday)
+    const todayDate = todayCell ? todayCell.date : selectedDate
+    
+    const todayCount = events.filter(e => e.date === todayDate).length
+    
+    const tTime = new Date(`${todayDate}T00:00:00`).getTime()
+    const weekCount = events.filter(e => {
+      const dTime = new Date(`${e.date}T00:00:00`).getTime()
+      return dTime >= tTime && dTime < tTime + 7 * 86400000
+    }).length
+    
+    return { todayCount, weekCount }
+  }, [events, cells, selectedDate])
 
   return (
     <div className="flex h-full flex-col lg:flex-row gap-6 lg:gap-8 overflow-hidden reveal-fade">
@@ -69,12 +93,16 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectE
               )
             })}
           </div>
+          <div className="mt-4 flex items-center justify-center gap-2 text-[11px] font-medium text-neutral-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#CBD8CB]" />
+            Days with scheduled events
+          </div>
         </div>
 
         <div className="card-surface p-5 border border-[var(--border-subtle)] bg-surface shadow-sm flex-1 hidden lg:flex flex-col overflow-hidden">
            <h3 className="text-caption font-bold text-neutral-text mb-3">Schedule Overview</h3>
            <p className="text-small text-neutral-muted leading-relaxed">
-             Corporate agenda view dynamically pulls upcoming events into a continuous, high-density table to eliminate empty space.
+             You have <strong className="text-neutral-text font-bold">{todayCount}</strong> events today and a total of <strong className="text-neutral-text font-bold">{weekCount}</strong> events scheduled over the next 7 days. Keep an eye on your high-priority items.
            </p>
         </div>
       </div>
@@ -84,20 +112,31 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectE
         <div className="border-b border-[var(--border-subtle)] px-6 py-4 bg-[#F3F3EA]/30">
            <h2 className="text-body font-bold text-neutral-text">Timeline</h2>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-2">
+        <div ref={timelineRef} className="flex-1 overflow-y-auto px-6 pb-6 scroll-smooth">
           {agendaEvents.map(group => (
-            <div key={group.date} className="mt-8 first:mt-4 reveal-scale">
-              <div className="sticky top-0 z-10 mb-3 bg-surface/95 backdrop-blur-md py-2 border-b border-[var(--border-subtle)]/50">
-                <h3 className="flex items-baseline gap-2">
-                  <span className={`text-body-lg font-bold ${group.isToday ? 'text-brand-teal' : 'text-neutral-text'}`}>
-                    {group.isToday ? 'Today' : group.dayLabel.split(',')[0]}
-                  </span>
-                  {!group.isToday && (
-                    <span className="text-small font-medium text-neutral-muted">
-                      {group.dayLabel.split(',')[1]}
+            <div key={group.date} className="mt-2 first:mt-0">
+              <div className="sticky top-0 z-10 -mx-6 px-6 mb-1 bg-surface py-2 border-b border-[var(--border-subtle)]">
+                <div className="flex items-center justify-between">
+                  <h3 className="flex items-baseline gap-2">
+                    <span className={`text-body-lg font-bold ${group.isToday ? 'text-brand-teal' : 'text-neutral-text'}`}>
+                      {group.isToday ? 'Today' : group.dayLabel.split(',')[0]}
                     </span>
+                    {!group.isToday && (
+                      <span className="text-small font-medium text-neutral-muted">
+                        {group.dayLabel.split(',')[1]}
+                      </span>
+                    )}
+                  </h3>
+                  {group.isToday && (
+                    <div className="flex items-center gap-1.5 text-brand-teal">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
+                      </span>
+                      <span className="text-micro font-bold uppercase tracking-wider">Now</span>
+                    </div>
                   )}
-                </h3>
+                </div>
               </div>
               
               {group.events.length === 0 ? (
@@ -130,7 +169,7 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectE
                           </p>
                         </div>
 
-                        <div className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${theme.wash} ${theme.text}`}>
+                        <div className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest border ${theme.border} ${theme.wash} ${theme.text}`}>
                           {theme.label || event.category}
                         </div>
                       </button>

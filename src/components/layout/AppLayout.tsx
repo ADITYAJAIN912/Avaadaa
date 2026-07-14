@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom'
 import { Sparkles } from 'lucide-react'
 import { AppBar } from './AppBar'
 import { MobileTabBar } from './MobileTabBar'
-import { MiniDayTimeline } from './MiniDayTimeline'
 import { AssistantRail } from '../ai-copilot/AssistantRail'
 import { useAiCopilot } from '../../context/AiCopilotContext'
 
@@ -13,7 +12,6 @@ export function AppLayout() {
     <div className="flex h-svh flex-col bg-neutral-bg overflow-hidden">
       <AppBar />
       <div className="flex flex-1 min-h-0">
-        <MiniDayTimeline />
         <main className="mx-auto w-full max-w-[1120px] flex flex-col flex-1 min-h-0 px-4 pb-24 pt-4 md:px-7 md:pb-6">
           <Outlet />
         </main>
@@ -23,11 +21,11 @@ export function AppLayout() {
         <button
           type="button"
           onClick={openDialog}
-          className="focus-ring group fixed bottom-24 right-4 z-raised flex items-center gap-3 transition-all duration-300 hover:-translate-y-1 hover:drop-shadow-xl md:bottom-8 md:right-8"
+          className="focus-ring group fixed bottom-24 right-4 z-raised flex items-center justify-end transition-all duration-300 hover:-translate-y-1 hover:drop-shadow-xl md:bottom-8 md:right-8"
           aria-label="Open Avaada Companion"
         >
-          {/* Text Pill */}
-          <div className="hidden items-center justify-center rounded-full bg-brand-navy px-5 py-3 text-[14.5px] font-extrabold tracking-tight text-white shadow-lg border border-white/10 sm:flex">
+          {/* Text Pill Tooltip */}
+          <div className="absolute right-[calc(100%+12px)] hidden sm:flex items-center justify-center rounded-full bg-brand-navy px-5 py-3 text-[14.5px] font-extrabold tracking-tight whitespace-nowrap text-white shadow-lg border border-white/10 transition-all duration-300 opacity-0 translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0">
             Ask your Companion
           </div>
           

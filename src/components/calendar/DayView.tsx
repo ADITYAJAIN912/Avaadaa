@@ -1,3 +1,4 @@
+import { useEffect, useRef, useMemo } from 'react'
 import { CalendarDays, Coffee, Target, Utensils, Video } from 'lucide-react'
 import type { CalendarEvent } from '../../types/calendar'
 import { TODAY, MOCK_NOW_TIME } from '../../data/constants'
@@ -32,12 +33,7 @@ function isActiveMeeting(event: CalendarEvent): boolean {
   return nowMins >= startMins && nowMins < endMins
 }
 
-function BlockIcon({ event }: { event: CalendarEvent }) {
-  const className = 'h-5 w-5 text-neutral-muted'
-  if (event.blockType === 'focus') return <Target className={className} strokeWidth={1.75} />
-  if (event.blockType === 'lunch') return <Utensils className={className} strokeWidth={1.75} />
-  return <Coffee className={className} strokeWidth={1.75} />
-}
+// BlockIcon removed as part of standardization
 
 export function DayView({ date, events, selectedEventId, onSelectEvent }: DayViewProps) {
   const meetings = events.filter((event) => !isCalendarBlock(event.blockType))
@@ -45,8 +41,27 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
   const focusMinutes = getFocusBlockMinutes(events)
   const agenda = buildDayAgenda(events)
 
+  const activeEventRef = useRef<HTMLDivElement>(null)
+
+  const focusEventId = useMemo(() => {
+    if (events.length === 0) return null
+    const active = events.find(isActiveMeeting)
+    if (active) return active.id
+    const upcoming = events.find(isUpcoming)
+    if (upcoming) return upcoming.id
+    return events[0]?.id
+  }, [events])
+
+  const activeEvent = useMemo(() => events.find(isActiveMeeting), [events])
+
+  useEffect(() => {
+    if (activeEventRef.current) {
+      activeEventRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [date])
+
   return (
-    <section className="card-surface reveal-fade flex flex-col overflow-hidden">
+    <section className="card-surface reveal-fade flex flex-1 min-h-0 flex-col overflow-hidden relative">
       <header className="shrink-0 border-b border-[var(--border-subtle)] bg-surface px-[22px] pb-3 pt-[18px]">
         <p className="kicker">Day view</p>
         <h2 className="mt-1 text-heading-lg font-extrabold tracking-[-0.01em] text-neutral-text">{formatSelectedDayLabel(date)}</h2>
@@ -60,15 +75,20 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
           <EmptyState icon={CalendarDays} title="No events scheduled" description="This day is open for strategy, recovery, or deep work." bare />
         </div>
       ) : (
-        <div className="relative bg-surface px-4 py-6">
-          <div className="mx-auto max-w-4xl">
+        <div className="relative bg-surface px-4 py-6 flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-4xl pb-16">
             {agenda.map(({ event, gapBeforePx }) => {
               const block = isCalendarBlock(event.blockType)
               const theme = getCategoryTheme(event.category)
               const selected = selectedEventId === event.id
               const active = isActiveMeeting(event)
               return (
-                <div key={event.id} className="grid grid-cols-[5rem_minmax(0,1fr)] gap-4" style={{ marginTop: gapBeforePx }}>
+                <div 
+                  key={event.id} 
+                  ref={event.id === focusEventId ? activeEventRef : null}
+                  className="grid grid-cols-[5rem_minmax(0,1fr)] gap-4" 
+                  style={{ marginTop: gapBeforePx }}
+                >
                   <div className="pt-4 text-right font-mono text-[11.5px] tabular-nums text-neutral-muted relative">
                     {active && <div className="absolute top-4 -left-4 w-2 h-2 rounded-full bg-brand-teal animate-pulse" />}
                     {event.time}
@@ -76,15 +96,18 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
                   <button type="button" onClick={() => onSelectEvent(event)} className={`group focus-ring flex w-full items-center gap-5 rounded-lg px-2 py-3 text-left transition-colors hover:bg-[#F3F3EA] ${selected ? 'ring-2 ring-brand-teal/30' : ''} ${active ? 'bg-brand-teal/5 ring-1 ring-inset ring-brand-teal border-transparent shadow-sm' : ''}`}>
                     {block ? (
                       <>
-                        <div className={`shrink-0 w-1 h-9 rounded-full ${active ? 'bg-brand-teal' : 'bg-neutral-border'}`} />
-                        <span className="shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-canvas"><BlockIcon event={event} /></span>
-                        <div className="flex-1 min-w-0">
+                        <div className={`shrink-0 w-1 h-9 rounded-full ${active ? 'bg-brand-teal' : theme.dot}`} />
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
                           <h4 className={`text-body font-bold truncate ${active ? 'text-brand-teal' : 'text-neutral-text'}`}>{getBlockLabel(event.blockType)}</h4>
                           <p className={`text-small font-medium truncate mt-0.5 ${active ? 'text-brand-teal/70' : 'text-neutral-muted'}`}>{formatEventTimeRange(event)} - {event.durationMinutes} min</p>
                         </div>
-                        {active && (
-                          <div className="shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-brand-teal text-white animate-fade-in">
+                        {active ? (
+                          <div className="shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-brand-teal text-white animate-fade-in shadow-sm">
                             In Progress
+                          </div>
+                        ) : (
+                          <div className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${theme.wash} ${theme.text}`}>
+                            {theme.label || event.category}
                           </div>
                         )}
                       </>
@@ -126,6 +149,7 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
           </div>
         </div>
       )}
+      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-16 w-full bg-gradient-to-t from-surface to-transparent" />
     </section>
   )
 }

@@ -21,13 +21,47 @@ export function isMeetingUpcoming(
   if (meeting.status === 'Completed') return false
   if (meeting.date < TODAY) return false
   if (meeting.date > TODAY) return true
+  // If it's today, it's upcoming if start time > nowTime (not yet started)
   return parseMeetingTime(meeting.time) > parseMeetingTime(nowTime)
+}
+
+export function isMeetingLive(
+  meeting: Meeting,
+  nowTime: string = MOCK_NOW_TIME,
+): boolean {
+  if (meeting.status === 'Completed') return false
+  if (meeting.date !== TODAY) return false
+  const startMins = parseMeetingTime(meeting.time)
+  const endMins = startMins + meeting.durationMinutes
+  const nowMins = parseMeetingTime(nowTime)
+  return nowMins >= startMins && nowMins < endMins
 }
 
 export function sortMeetingsChronologically(a: Meeting, b: Meeting): number {
   const dateCmp = a.date.localeCompare(b.date)
   if (dateCmp !== 0) return dateCmp
   return parseMeetingTime(a.time) - parseMeetingTime(b.time)
+}
+
+export function sortMeetingsForLibrary(a: Meeting, b: Meeting): number {
+  const aLive = isMeetingLive(a)
+  const bLive = isMeetingLive(b)
+  if (aLive && !bLive) return -1
+  if (!aLive && bLive) return 1
+  
+  const aUpcoming = isMeetingUpcoming(a)
+  const bUpcoming = isMeetingUpcoming(b)
+  
+  if (aUpcoming && !bUpcoming) return -1
+  if (!aUpcoming && bUpcoming) return 1
+  
+  if (aUpcoming && bUpcoming) {
+    // Both upcoming: chronological (soonest first)
+    return sortMeetingsChronologically(a, b)
+  }
+  
+  // Both past: reverse chronological (most recent first)
+  return sortMeetingsChronologically(b, a)
 }
 
 export function getUpcomingMeetings(meetings: Meeting[], limit?: number): Meeting[] {

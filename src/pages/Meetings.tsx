@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom'
-import { LoadingScreen } from '../components/ui/LoadingScreen'
+import { MeetingsSkeleton } from '../components/ui/PageSkeletons'
 import { MeetingLibrary } from '../components/meetings/room/MeetingLibrary'
 import { MeetingRoom } from '../components/meetings/room/MeetingRoom'
 import { useAiCopilot } from '../context/AiCopilotContext'
@@ -10,7 +10,7 @@ import { usePageLoading } from '../hooks/usePageLoading'
 import type { DateFilter } from '../components/meetings/FilterChips'
 import { createMeetingCopilotConfig } from '../components/workspace/copilot/meetingCopilot'
 import { getDayGroup } from '../utils/helpers'
-import { sortMeetingsChronologically } from '../utils/meetings'
+import { sortMeetingsForLibrary } from '../utils/meetings'
 import { resolveMeetingContext } from '../utils/meetingContext'
 
 const filterToGroups: Record<Exclude<DateFilter, 'custom'>, Array<'Today' | 'Tomorrow' | 'This Week'>> = {
@@ -71,7 +71,7 @@ export function Meetings() {
         const group = getDayGroup(meeting.date)
         return group ? filterToGroups[dateFilter].includes(group) : false
       })
-      .sort(sortMeetingsChronologically)
+      .sort(sortMeetingsForLibrary)
   }, [meetings, search, dateFilter, customDate])
 
   const meetingContext = useMemo(
@@ -91,7 +91,7 @@ export function Meetings() {
   }, [meetingContext, setPageConfig])
 
   if (isLoading) {
-    return <LoadingScreen message="Preparing your meetings..." />
+    return <MeetingsSkeleton />
   }
 
   if (selectedMeetingId) {

@@ -131,6 +131,14 @@ export default {
         modal: 'var(--z-modal)',
         toast: 'var(--z-toast)',
       },
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 3s infinite',
+      },
     },
   },
 } satisfies Config
