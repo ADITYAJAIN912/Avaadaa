@@ -4,7 +4,7 @@ import type { Meeting } from '../../../types/meeting'
 import { TODAY } from '../../../data/constants'
 import { formatDisplayDate, getDayGroup } from '../../../utils/helpers'
 import { isMeetingLive } from '../../../utils/meetings'
-import type { DateFilter } from '../FilterChips'
+import type { DateFilter } from '../../../types/meeting'
 import { SearchInput } from '../../ui/SearchInput'
 import { EmptyState } from '../../ui/EmptyState'
 
@@ -52,7 +52,7 @@ type StatusStyle = {
  *    - Accent: Green (bg-[#8FD1A5])
  *    - Meaning: The meeting is currently active in real-time.
  * 
- * 3. Upcoming:
+ * 3. 'Upcoming':
  *    - Accent: Orange (bg-status-warning)
  *    - Meaning: The meeting is scheduled for the future but hasn't started yet.
  */
@@ -208,7 +208,7 @@ export function MeetingLibrary({
                 <div className="space-y-2">
                   {group.items.map((meeting) => {
                     const style = getStatusStyle(meeting)
-                    const isLive = meeting.status === 'Scheduled'
+                    const isLive = meeting.status === 'Upcoming'
 
                     if (isLive) {
                       return (

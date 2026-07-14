@@ -36,7 +36,7 @@ export const mockMeetings: Meeting[] = [
     source: 'GOOGLE',
     autoJoin: true,
     videoRec: false,
-    status: 'Scheduled',
+    status: 'Upcoming',
   },
   {
     id: 'm3',
@@ -105,7 +105,7 @@ export const mockMeetings: Meeting[] = [
     source: 'GOOGLE',
     autoJoin: true,
     videoRec: false,
-    status: 'Scheduled',
+    status: 'Upcoming',
   },
   {
     id: 'm8',
@@ -121,7 +121,7 @@ export const mockMeetings: Meeting[] = [
     source: 'GOOGLE',
     autoJoin: true,
     videoRec: false,
-    status: 'Scheduled',
+    status: 'Upcoming',
   },
   {
     id: 'm9',

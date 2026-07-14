@@ -11,7 +11,7 @@ import { formatDuration, getMeetingDurationMinutes, getPlatformLabel } from '../
 
 function mapMeetingStatus(meeting: Meeting): MeetingContextStatus {
   if (meeting.status === 'Completed') return 'completed'
-  if (meeting.status === 'Scheduled') return 'scheduled'
+  if (meeting.status === 'Upcoming') return 'scheduled'
   return 'upcoming'
 }
 
@@ -340,7 +340,7 @@ function buildFallbackContext(meeting: Meeting): MeetingContextSeed {
       ? `Transcript available for ${meeting.title}. Full source text accessible in a later milestone.`
       : 'Transcript will populate after the meeting ends.',
     relatedThreads: [
-      { id: `t-${meeting.id}`, title: meeting.title, status: isCompleted ? 'Review' : 'Scheduled' },
+      { id: `t-${meeting.id}`, title: meeting.title, status: isCompleted ? 'Review' : 'Upcoming' },
     ],
     peopleMentioned: meeting.attendees
       .filter((a) => a.name !== 'Recorder Bot' && a.name !== 'Bot')

@@ -35,7 +35,6 @@ export function MonthGrid({ cells, events, selectedDate, onSelectDate, onSelectE
   }, [cells, events, selectedDate])
 
   const { todayCount, weekCount } = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0] // or use a passed TODAY constant if available, but since we don't have it imported, we'll just use the first cell's month to approximate, or actually just look at the selectedDate's count? 
     // Wait, let's use the first cell that has isToday
     const todayCell = cells.find(c => c.isToday)
     const todayDate = todayCell ? todayCell.date : selectedDate

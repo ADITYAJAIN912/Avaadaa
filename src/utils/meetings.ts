@@ -32,7 +32,7 @@ export function isMeetingLive(
   if (meeting.status === 'Completed') return false
   if (meeting.date !== TODAY) return false
   const startMins = parseMeetingTime(meeting.time)
-  const endMins = startMins + meeting.durationMinutes
+  const endMins = startMins + (meeting.durationMinutes || 60)
   const nowMins = parseMeetingTime(nowTime)
   return nowMins >= startMins && nowMins < endMins
 }

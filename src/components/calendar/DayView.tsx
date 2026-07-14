@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo } from 'react'
-import { CalendarDays, Coffee, Target, Utensils, Video } from 'lucide-react'
+import { CalendarDays, Video } from 'lucide-react'
 import type { CalendarEvent } from '../../types/calendar'
 import { TODAY, MOCK_NOW_TIME } from '../../data/constants'
 import { formatSelectedDayLabel } from '../../utils/calendar'
@@ -52,7 +52,7 @@ export function DayView({ date, events, selectedEventId, onSelectEvent }: DayVie
     return events[0]?.id
   }, [events])
 
-  const activeEvent = useMemo(() => events.find(isActiveMeeting), [events])
+
 
   useEffect(() => {
     if (activeEventRef.current) {
